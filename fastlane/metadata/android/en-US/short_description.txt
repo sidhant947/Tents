@@ -1,0 +1,1 @@
+A logic puzzle game where goal is to place tents in the grid

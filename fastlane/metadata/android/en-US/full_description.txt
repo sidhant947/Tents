@@ -1,0 +1,7 @@
+Tents is a logic puzzle game. The goal is to place tents in the grid so that every tree is paired with a tent according to grid constraints.
+
+Free and Open Source
+No Ads
+No Trackers or Telemetry
+No Data Collection
+Works Completely Offline
