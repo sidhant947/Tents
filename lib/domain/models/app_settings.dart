@@ -159,18 +159,22 @@ enum AppThemePreset {
 class AppSettings {
   const AppSettings({
     this.isHintEnabled = false,
+    this.isCheckButtonEnabled = false,
     this.theme = AppThemePreset.pastelButter,
   });
 
   final bool isHintEnabled;
+  final bool isCheckButtonEnabled;
   final AppThemePreset theme;
 
   AppSettings copyWith({
     bool? isHintEnabled,
+    bool? isCheckButtonEnabled,
     AppThemePreset? theme,
   }) {
     return AppSettings(
       isHintEnabled: isHintEnabled ?? this.isHintEnabled,
+      isCheckButtonEnabled: isCheckButtonEnabled ?? this.isCheckButtonEnabled,
       theme: theme ?? this.theme,
     );
   }

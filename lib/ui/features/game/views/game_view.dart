@@ -122,6 +122,7 @@ class _GameViewState extends ConsumerState<GameView> {
   }
 
   Widget _buildGame(GameViewModelState state) {
+    final settings = ref.watch(settingsProvider);
     final level = state.level;
     if (level == null) return const SizedBox.shrink();
 
@@ -149,24 +150,8 @@ class _GameViewState extends ConsumerState<GameView> {
 
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.fromLTRB(20, 8, 20, 16),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppColors.border,
-              width: 1.5,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.headingDark.withValues(alpha: 0.08),
-                offset: const Offset(0, 4),
-                blurRadius: 6,
-              ),
-            ],
-          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -363,7 +348,7 @@ class _GameViewState extends ConsumerState<GameView> {
                   ),
                 ),
               ),
-              if (ref.watch(settingsProvider).isHintEnabled) ...[
+              if (settings.isHintEnabled) ...[
                 const SizedBox(width: 12),
                 GestureDetector(
                   onTap: (state.hintsRemaining > 0 && !state.isComplete)
@@ -416,7 +401,7 @@ class _GameViewState extends ConsumerState<GameView> {
             ],
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
+            padding: EdgeInsets.symmetric(vertical: settings.isCheckButtonEnabled ? 10 : 16),
             child: Text(
               'Tap: Tent  |  Long press: Cross',
               style: TextStyle(
@@ -425,6 +410,62 @@ class _GameViewState extends ConsumerState<GameView> {
               ),
             ),
           ),
+          if (settings.isCheckButtonEnabled) ...[
+            GestureDetector(
+              onTap: !state.isComplete
+                  ? () {
+                      HapticFeedback.lightImpact();
+                      final solved = ref.read(gameViewModelProvider.notifier).checkSolution();
+                      if (!solved) {
+                        ScaffoldMessenger.of(context).clearSnackBars();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Not solved yet',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.headingDark,
+                              ),
+                            ),
+                            duration: const Duration(seconds: 2),
+                            behavior: SnackBarBehavior.floating,
+                            margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              side: BorderSide(color: AppColors.border, width: 1.0),
+                            ),
+                            backgroundColor: AppColors.surface,
+                          ),
+                        );
+                      }
+                    }
+                  : null,
+              child: Container(
+                width: double.infinity,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: AppColors.border,
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  'Check Solution',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.headingDark,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
         ],
       ],
     );

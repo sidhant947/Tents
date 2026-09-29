@@ -22,4 +22,9 @@ class SettingsViewModel extends StateNotifier<AppSettings> {
     state = state.copyWith(isHintEnabled: value);
     await settingsService.saveSettings(state);
   }
+
+  Future<void> toggleCheckButtonEnabled(bool value) async {
+    state = state.copyWith(isCheckButtonEnabled: value);
+    await settingsService.saveSettings(state);
+  }
 }

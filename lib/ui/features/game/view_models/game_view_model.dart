@@ -111,6 +111,8 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
   Timer? _timer;
   Timer? _hintTimer;
 
+  bool get _autoCheck => !settingsService.getSettings().isCheckButtonEnabled;
+
   void _startTimer() {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
@@ -176,7 +178,7 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
         board = _createInitialBoard(level);
       }
 
-      final isComplete = CellRules.isComplete(board, level);
+      final isComplete = _autoCheck && CellRules.isComplete(board, level);
 
       state = GameViewModelState(
         level: level,
@@ -299,7 +301,7 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
 
     newBoard[r][c] = next;
 
-    final isComplete = CellRules.isComplete(newBoard, level);
+    final isComplete = _autoCheck && CellRules.isComplete(newBoard, level);
 
     if (isComplete) {
       HapticFeedback.heavyImpact();
@@ -336,7 +338,7 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
 
     newBoard[r][c] = next;
 
-    final isComplete = CellRules.isComplete(newBoard, level);
+    final isComplete = _autoCheck && CellRules.isComplete(newBoard, level);
 
     if (isComplete) {
       HapticFeedback.heavyImpact();
@@ -372,7 +374,7 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
 
     newBoard[r][c] = next;
 
-    final isComplete = CellRules.isComplete(newBoard, level);
+    final isComplete = _autoCheck && CellRules.isComplete(newBoard, level);
 
     if (isComplete) {
       HapticFeedback.heavyImpact();
@@ -429,7 +431,7 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
     final newBoard = state.board.map((row) => List<CellState>.from(row)).toList();
     newBoard[targetRow][targetCol] = CellState.tent;
 
-    final isComplete = CellRules.isComplete(newBoard, level);
+    final isComplete = _autoCheck && CellRules.isComplete(newBoard, level);
 
     if (isComplete) {
       HapticFeedback.heavyImpact();
@@ -467,6 +469,20 @@ class GameViewModel extends StateNotifier<GameViewModelState> {
       state.moveCount,
       state.elapsedSeconds,
     );
+  }
+
+  bool checkSolution() {
+    final level = state.level;
+    if (level == null || state.isComplete) return false;
+
+    final isComplete = CellRules.isComplete(state.board, level);
+    if (isComplete) {
+      HapticFeedback.heavyImpact();
+      _stopTimer();
+      state = state.copyWith(isComplete: true);
+      return true;
+    }
+    return false;
   }
 
   Future<void> completeLevel() async {

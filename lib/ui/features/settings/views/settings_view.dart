@@ -145,6 +145,18 @@ class SettingsView extends ConsumerWidget {
 
                   _divider(),
 
+                  _gameToggle(
+                    label: 'Check Solution Button',
+                    value: settings.isCheckButtonEnabled,
+                    onChanged: (val) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleCheckButtonEnabled(val);
+                    },
+                  ),
+
+                  _divider(),
+
                   const SizedBox(height: 8),
                   TangibleButton(
                     text: 'Become a Backer',
