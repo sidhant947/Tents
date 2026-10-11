@@ -27,4 +27,9 @@ class SettingsViewModel extends StateNotifier<AppSettings> {
     state = state.copyWith(isCheckButtonEnabled: value);
     await settingsService.saveSettings(state);
   }
+
+  Future<void> toggleTentCrossButtonsEnabled(bool value) async {
+    state = state.copyWith(isTentCrossButtonsEnabled: value);
+    await settingsService.saveSettings(state);
+  }
 }

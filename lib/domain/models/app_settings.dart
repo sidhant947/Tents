@@ -160,21 +160,26 @@ class AppSettings {
   const AppSettings({
     this.isHintEnabled = false,
     this.isCheckButtonEnabled = false,
+    this.isTentCrossButtonsEnabled = false,
     this.theme = AppThemePreset.pastelButter,
   });
 
   final bool isHintEnabled;
   final bool isCheckButtonEnabled;
+  final bool isTentCrossButtonsEnabled;
   final AppThemePreset theme;
 
   AppSettings copyWith({
     bool? isHintEnabled,
     bool? isCheckButtonEnabled,
+    bool? isTentCrossButtonsEnabled,
     AppThemePreset? theme,
   }) {
     return AppSettings(
       isHintEnabled: isHintEnabled ?? this.isHintEnabled,
       isCheckButtonEnabled: isCheckButtonEnabled ?? this.isCheckButtonEnabled,
+      isTentCrossButtonsEnabled:
+          isTentCrossButtonsEnabled ?? this.isTentCrossButtonsEnabled,
       theme: theme ?? this.theme,
     );
   }

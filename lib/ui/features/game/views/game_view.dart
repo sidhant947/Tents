@@ -28,6 +28,7 @@ class GameView extends ConsumerStatefulWidget {
 
 class _GameViewState extends ConsumerState<GameView> {
   CellState? _dragTargetState;
+  CellState _inputMode = CellState.tent;
 
   @override
   void initState() {
@@ -263,10 +264,26 @@ class _GameViewState extends ConsumerState<GameView> {
                                                       isTree: isTree,
                                                       isHinted: isHinted,
                                                       onTap: () {
-                                                        ref.read(gameViewModelProvider.notifier).toggleCell(r, c);
+                                                        if (settings.isTentCrossButtonsEnabled) {
+                                                          if (_inputMode == CellState.tent) {
+                                                            ref.read(gameViewModelProvider.notifier).toggleCell(r, c);
+                                                          } else {
+                                                            ref.read(gameViewModelProvider.notifier).toggleCross(r, c);
+                                                          }
+                                                        } else {
+                                                          ref.read(gameViewModelProvider.notifier).toggleCell(r, c);
+                                                        }
                                                       },
                                                       onLongPress: () {
-                                                        ref.read(gameViewModelProvider.notifier).toggleCross(r, c);
+                                                        if (settings.isTentCrossButtonsEnabled) {
+                                                          if (_inputMode == CellState.tent) {
+                                                            ref.read(gameViewModelProvider.notifier).toggleCross(r, c);
+                                                          } else {
+                                                            ref.read(gameViewModelProvider.notifier).toggleCell(r, c);
+                                                          }
+                                                        } else {
+                                                          ref.read(gameViewModelProvider.notifier).toggleCross(r, c);
+                                                        }
                                                       },
                                                     ),
                                                   );
@@ -385,7 +402,7 @@ class _GameViewState extends ConsumerState<GameView> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            'Hint (${state.hintsRemaining}/2)',
+                            'Hint',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -400,17 +417,27 @@ class _GameViewState extends ConsumerState<GameView> {
               ],
             ],
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(vertical: settings.isCheckButtonEnabled ? 10 : 16),
-            child: Text(
-              'Tap: Tent  |  Long press: Cross',
-              style: TextStyle(
-                fontSize: 12,
-                color: AppColors.subtext,
+          if (settings.isTentCrossButtonsEnabled) ...[
+            Container(
+              height: 1,
+              color: AppColors.border.withValues(alpha: 0.25),
+              margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            _buildModeSelector(),
+          ],
+          if (!settings.isTentCrossButtonsEnabled)
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: settings.isCheckButtonEnabled ? 10 : 16),
+              child: Text(
+                'Tap: Tent  |  Long press: Cross',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.subtext,
+                ),
               ),
             ),
-          ),
           if (settings.isCheckButtonEnabled) ...[
+            const SizedBox(height: 12),
             GestureDetector(
               onTap: !state.isComplete
                   ? () {
@@ -464,8 +491,8 @@ class _GameViewState extends ConsumerState<GameView> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
           ],
+          const SizedBox(height: 24),
         ],
       ],
     );
@@ -486,12 +513,24 @@ class _GameViewState extends ConsumerState<GameView> {
       final current = stateProvider.board[r][c];
 
       if (isStart) {
-        if (current == CellState.empty || current == CellState.x) {
-          _dragTargetState = CellState.tent;
-        } else if (current == CellState.tent) {
-          _dragTargetState = CellState.empty;
+        final settings = ref.read(settingsProvider);
+        final activeMode = settings.isTentCrossButtonsEnabled ? _inputMode : CellState.tent;
+        if (activeMode == CellState.x) {
+          if (current == CellState.empty || current == CellState.tent) {
+            _dragTargetState = CellState.x;
+          } else if (current == CellState.x) {
+            _dragTargetState = CellState.empty;
+          } else {
+            _dragTargetState = null;
+          }
         } else {
-          _dragTargetState = null;
+          if (current == CellState.empty || current == CellState.x) {
+            _dragTargetState = CellState.tent;
+          } else if (current == CellState.tent) {
+            _dragTargetState = CellState.empty;
+          } else {
+            _dragTargetState = null;
+          }
         }
       }
 
@@ -500,6 +539,97 @@ class _GameViewState extends ConsumerState<GameView> {
         ref.read(gameViewModelProvider.notifier).setCellState(r, c, _dragTargetState!);
       }
     }
+  }
+
+  Widget _buildModeSelector() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          Expanded(
+            child: _buildModeButton(
+              icon: const TentWidget(size: 20),
+              label: 'Tent',
+              isSelected: _inputMode == CellState.tent,
+              onTap: () {
+                if (_inputMode != CellState.tent) {
+                  HapticFeedback.selectionClick();
+                  setState(() => _inputMode = CellState.tent);
+                }
+              },
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: _buildModeButton(
+              icon: CrossWidget(
+                size: 20,
+                color: _inputMode == CellState.x
+                    ? AppColors.headingDark
+                    : AppColors.subtext,
+              ),
+              label: 'Cross',
+              isSelected: _inputMode == CellState.x,
+              onTap: () {
+                if (_inputMode != CellState.x) {
+                  HapticFeedback.selectionClick();
+                  setState(() => _inputMode = CellState.x);
+                }
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeButton({
+    required Widget icon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        height: 44,
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.border
+                : AppColors.border.withValues(alpha: 0.5),
+            width: isSelected ? 1.5 : 1.0,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: AppColors.headingDark.withValues(alpha: 0.12),
+                    offset: const Offset(0, 3),
+                    blurRadius: 4,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppColors.headingDark : AppColors.subtext,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _circleButton({

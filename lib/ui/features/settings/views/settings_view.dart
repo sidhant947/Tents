@@ -71,9 +71,13 @@ class SettingsView extends ConsumerWidget {
               child: ListView(
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                 children: [
-                  _sectionTitle(
-                    title: 'Theme',
-                    valueText: settings.theme.displayName,
+                  Text(
+                    'Theme',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.headingDark,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   SizedBox(
@@ -157,6 +161,18 @@ class SettingsView extends ConsumerWidget {
 
                   _divider(),
 
+                  _gameToggle(
+                    label: 'Tent & Cross Buttons',
+                    value: settings.isTentCrossButtonsEnabled,
+                    onChanged: (val) {
+                      ref
+                          .read(settingsProvider.notifier)
+                          .toggleTentCrossButtonsEnabled(val);
+                    },
+                  ),
+
+                  _divider(),
+
                   const SizedBox(height: 8),
                   TangibleButton(
                     text: 'Become a Backer',
@@ -186,29 +202,6 @@ class SettingsView extends ConsumerWidget {
     );
   }
 
-  Widget _sectionTitle({required String title, required String valueText}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: AppColors.headingDark,
-          ),
-        ),
-        Text(
-          valueText,
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.normal,
-            color: AppColors.subtext,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _divider() {
     return Container(
@@ -223,90 +216,63 @@ class SettingsView extends ConsumerWidget {
     required bool value,
     required ValueChanged<bool> onChanged,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: AppColors.headingDark,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        HapticFeedback.selectionClick();
+        onChanged(!value);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.headingDark,
+              ),
             ),
-          ),
-          Container(
-            height: 36,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.border, width: 1.0),
-            ),
-            padding: const EdgeInsets.all(3),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    if (!value) {
-                      HapticFeedback.selectionClick();
-                      onChanged(true);
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: value ? AppColors.accent : Colors.transparent,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Text(
-                      'On',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: value
-                            ? (AppColors.currentTheme.isDark
-                                ? const Color(0xFF121212)
-                                : const Color(0xFFFFFFFF))
-                            : AppColors.subtext,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              width: 48,
+              height: 28,
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14),
+                color: value
+                    ? AppColors.accent
+                    : AppColors.headingDark.withValues(alpha: 0.12),
+                border: Border.all(
+                  color: value ? AppColors.accent : AppColors.border,
+                  width: 1.0,
+                ),
+              ),
+              child: AnimatedAlign(
+                duration: const Duration(milliseconds: 180),
+                curve: Curves.easeInOut,
+                alignment: value ? Alignment.centerRight : Alignment.centerLeft,
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        offset: const Offset(0, 1.5),
+                        blurRadius: 3,
                       ),
-                    ),
+                    ],
                   ),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    if (value) {
-                      HapticFeedback.selectionClick();
-                      onChanged(false);
-                    }
-                  },
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 150),
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: !value
-                          ? AppColors.headingDark.withValues(alpha: 0.15)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(7),
-                    ),
-                    child: Text(
-                      'Off',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: !value ? AppColors.headingDark : AppColors.subtext,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
