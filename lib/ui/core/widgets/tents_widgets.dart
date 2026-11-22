@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:tents/ui/core/theme/app_colors.dart';
 
 class TreeWidget extends StatelessWidget {

@@ -32,4 +32,9 @@ class SettingsViewModel extends StateNotifier<AppSettings> {
     state = state.copyWith(isTentCrossButtonsEnabled: value);
     await settingsService.saveSettings(state);
   }
+
+  Future<void> toggleRemainingInfoEnabled(bool value) async {
+    state = state.copyWith(isRemainingInfoEnabled: value);
+    await settingsService.saveSettings(state);
+  }
 }

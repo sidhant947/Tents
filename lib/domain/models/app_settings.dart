@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 enum AppThemePreset {
   pastelMint(
@@ -161,18 +161,21 @@ class AppSettings {
     this.isHintEnabled = false,
     this.isCheckButtonEnabled = false,
     this.isTentCrossButtonsEnabled = false,
+    this.isRemainingInfoEnabled = false,
     this.theme = AppThemePreset.pastelButter,
   });
 
   final bool isHintEnabled;
   final bool isCheckButtonEnabled;
   final bool isTentCrossButtonsEnabled;
+  final bool isRemainingInfoEnabled;
   final AppThemePreset theme;
 
   AppSettings copyWith({
     bool? isHintEnabled,
     bool? isCheckButtonEnabled,
     bool? isTentCrossButtonsEnabled,
+    bool? isRemainingInfoEnabled,
     AppThemePreset? theme,
   }) {
     return AppSettings(
@@ -180,6 +183,8 @@ class AppSettings {
       isCheckButtonEnabled: isCheckButtonEnabled ?? this.isCheckButtonEnabled,
       isTentCrossButtonsEnabled:
           isTentCrossButtonsEnabled ?? this.isTentCrossButtonsEnabled,
+      isRemainingInfoEnabled:
+          isRemainingInfoEnabled ?? this.isRemainingInfoEnabled,
       theme: theme ?? this.theme,
     );
   }

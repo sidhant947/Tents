@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/services.dart';
 
@@ -172,7 +172,7 @@ class _GameViewState extends ConsumerState<GameView> {
                 aspectRatio: 1.0,
                 child: LayoutBuilder(
                   builder: (context, outerConstraints) {
-                    final headerSize = 28.0;
+                    final headerSize = settings.isRemainingInfoEnabled ? 32.0 : 28.0;
                     final gridWidth = outerConstraints.maxWidth - headerSize;
                     final gridHeight = outerConstraints.maxHeight - headerSize;
                     final sideLength = math.min(gridWidth, gridHeight);
@@ -192,14 +192,21 @@ class _GameViewState extends ConsumerState<GameView> {
                                   child: Row(
                                     children: List.generate(N, (c) {
                                       final target = level.colTentCounts[c];
+                                      final isPlaced = settings.isRemainingInfoEnabled && colTentsCurrent[c] > 0;
+                                      final text = isPlaced
+                                          ? '${colTentsCurrent[c]}/$target'
+                                          : '$target';
                                       return Expanded(
                                         child: Center(
-                                          child: Text(
-                                            '$target',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.headingDark,
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              text,
+                                              style: TextStyle(
+                                                fontSize: isPlaced ? 11 : 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.headingDark,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -219,14 +226,21 @@ class _GameViewState extends ConsumerState<GameView> {
                                   child: Column(
                                     children: List.generate(N, (r) {
                                       final target = level.rowTentCounts[r];
+                                      final isPlaced = settings.isRemainingInfoEnabled && rowTentsCurrent[r] > 0;
+                                      final text = isPlaced
+                                          ? '${rowTentsCurrent[r]}/$target'
+                                          : '$target';
                                       return Expanded(
                                         child: Center(
-                                          child: Text(
-                                            '$target',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w500,
-                                              color: AppColors.headingDark,
+                                          child: FittedBox(
+                                            fit: BoxFit.scaleDown,
+                                            child: Text(
+                                              text,
+                                              style: TextStyle(
+                                                fontSize: isPlaced ? 11 : 13,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.headingDark,
+                                              ),
                                             ),
                                           ),
                                         ),
