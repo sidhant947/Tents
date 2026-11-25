@@ -192,6 +192,7 @@ class _GameViewState extends ConsumerState<GameView> {
                                   child: Row(
                                     children: List.generate(N, (c) {
                                       final target = level.colTentCounts[c];
+                                      final isComplete = colTentsCurrent[c] == target;
                                       final isPlaced = settings.isRemainingInfoEnabled && colTentsCurrent[c] > 0;
                                       final text = isPlaced
                                           ? '${colTentsCurrent[c]}/$target'
@@ -205,7 +206,9 @@ class _GameViewState extends ConsumerState<GameView> {
                                               style: TextStyle(
                                                 fontSize: isPlaced ? 11 : 13,
                                                 fontWeight: FontWeight.w500,
-                                                color: AppColors.headingDark,
+                                                color: isComplete
+                                                    ? AppColors.headingDark.withValues(alpha: 0.35)
+                                                    : AppColors.headingDark,
                                               ),
                                             ),
                                           ),
@@ -226,6 +229,7 @@ class _GameViewState extends ConsumerState<GameView> {
                                   child: Column(
                                     children: List.generate(N, (r) {
                                       final target = level.rowTentCounts[r];
+                                      final isComplete = rowTentsCurrent[r] == target;
                                       final isPlaced = settings.isRemainingInfoEnabled && rowTentsCurrent[r] > 0;
                                       final text = isPlaced
                                           ? '${rowTentsCurrent[r]}/$target'
@@ -239,7 +243,9 @@ class _GameViewState extends ConsumerState<GameView> {
                                               style: TextStyle(
                                                 fontSize: isPlaced ? 11 : 13,
                                                 fontWeight: FontWeight.w500,
-                                                color: AppColors.headingDark,
+                                                color: isComplete
+                                                    ? AppColors.headingDark.withValues(alpha: 0.35)
+                                                    : AppColors.headingDark,
                                               ),
                                             ),
                                           ),
